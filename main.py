@@ -1,5 +1,6 @@
 import telebot
-# import random
+# # import random
+# import os
 from telebot import types
 from configureted.token_bot import token_bot
 
@@ -14,11 +15,19 @@ def start(message):
     mk4 = types.KeyboardButton('/music')
     markup.add(mk1, mk2)
     markup.add(mk3, mk4)
-    bot.send_message(message.chat.id, "Приветик😊, {0.first_name}! \n \nЕсли нужна помощь напиши /help".format(message.from_user), reply_markup=markup )
+    bot.send_message(message.chat.id, "Приветик😊, {0.first_name}!"
+                                    " \n \nЕсли нужна помощь напиши /help"
+                                    .format(message.from_user), reply_markup=markup)
 
-@bot.message_handler(commands=['search'])
-def search(message):
-    bot.send_message(message.chat.id, "Введите название песни")
+@bot.message_handler(commands=['music'])
+def listmusic(message):
+    bth = types.InlineKeyboardMarkup(row_width=2)
+    bt1 = types.InlineKeyboardButton("Added", callback_data="added")
+    bt2 = types.InlineKeyboardButton("random", callback_data="rand")
+    # bt3 = types.InlineKeyboardButton("close", callback_data="close")
+    bth.add(bt1, bt2)
+    # bth.add(bt3)
+    bot.send_message(message.chat.id, "Выберите действие".format(message.from_user), reply_markup=bth)
 
 @bot.message_handler(commands=['help'])
 def help(message):
@@ -51,6 +60,15 @@ def callback(call):
             if call.data == "addmusic":
                 bot.send_message(call.message.chat.id, '/music - команда позволяет подбирать рандомный трек.\n'
                                                        'Так же вы можете загрузить свой трек')
+
+        if call.message:
+            if call.data == "added":
+                bot.send_message(call.message.chat.id, 'Загрузите вашу песню...')
+
+        if call.message:
+            if call.data == "rand":
+                bot.send_message(call.message.chat.id, 'Идет подборка песни, прошу подождите пожалуйста...')
+
     except Exception as e:
         print(repr(e))
 
