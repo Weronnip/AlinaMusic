@@ -23,6 +23,11 @@ def start(message):
 def post(message):
     chat = message.chat.id
 
+    input_query = bot.send_message(chat, 'Введите поисковой запрос: ')
+    bot.register_next_step_handler(input_query, send_search_request_and_print_result)
+def send_search_request_and_print_result(query):
+    search_result = client.search(query)
+
     type_to_name = {
         'track': 'трек',
         'artist': 'исполнитель',
@@ -34,48 +39,44 @@ def post(message):
         'podcast_episode': 'эпизод подкаста',
     }
 
-    def send_search_request_and_print_result(query):
-        search_result = client.search(query)
+    text = [f'Результаты по запросу "{query}":', '']
 
-        text = [f'Результаты по запросу "{query}":', '']
+    best_result_text = ''
+    if search_result.best:
+        type_ = search_result.best.type
+        best = search_result.best.result
 
-        best_result_text = ''
-        if search_result.best:
-            type_ = search_result.best.type
-            best = search_result.best.result
+        text.append(f'❗️Лучший результат: {type_to_name.get(type_)}')
 
-            text.append(bot.send_message(chat, f'❗️Лучший результат: {type_to_name.get(type_)}'))
+        if type_ in ['track', 'podcast_episode']:
+            artists = ''
+            if best.artists:
+                artists = ' - ' + ', '.join(artist.name for artist in best.artists)
+            best_result_text = best.title + artists
+        elif type_ == 'artist':
+            best_result_text = best.name
+        elif type_ in ['album', 'podcast']:
+            best_result_text = best.title
+        elif type_ == 'playlist':
+            best_result_text = best.title
+        elif type_ == 'video':
+            best_result_text = f'{best.title} {best.text}'
 
-            if type_ in ['track', 'podcast_episode']:
-                artists = ''
-                if best.artists:
-                    artists = ' - ' + ', '.join(artist.name for artist in best.artists)
-                best_result_text = best.title + artists
-            elif type_ == 'artist':
-                best_result_text = best.name
-            elif type_ in ['album', 'podcast']:
-                best_result_text = best.title
-            elif type_ == 'playlist':
-                best_result_text = best.title
-            elif type_ == 'video':
-                best_result_text = f'{best.title} {best.text}'
+        text.append(f'Содержимое лучшего результата: {best_result_text}\n')
 
-            text.append(bot.send_message(chat, f'Содержимое лучшего результата: {best_result_text}\n'))
-
-        if search_result.artists:
-            text.append(bot.send_message(chat, f'Исполнителей: {search_result.artists.total}'))
-        if search_result.albums:
-            text.append(bot.send_message(chat, f'Альбомов: {search_result.albums.total}'))
-        if search_result.tracks:
-            text.append(bot.send_message(chat, f'Треков: {search_result.tracks.total}'))
-        if search_result.playlists:
-            text.append(bot.send_message(chat, f'Плейлистов: {search_result.playlists.total}'))
-        if search_result.videos:
-            text.append(bot.send_message(chat, f'Видео: {search_result.videos.total}'))
+    if search_result.artists:
+        text.append(f'Исполнителей: {search_result.artists.total}')
+    if search_result.albums:
+        text.append(f'Альбомов: {search_result.albums.total}')
+    if search_result.tracks:
+        text.append(f'Треков: {search_result.tracks.total}')
+    if search_result.playlists:
+        text.append(f'Плейлистов: {search_result.playlists.total}')
+    if search_result.videos:
+        text.append(f'Видео: {search_result.videos.total}')
 
     if __name__ == '__main__':
-        while True:
-            input_query = input('Введите поисковой запрос: ')
-            send_search_request_and_print_result(input_query)
+            while True:
+                pass
 
 bot.polling(none_stop=True, interval=0)
