@@ -6,6 +6,12 @@ client = Client().init()
 type_to_name = {
     'track': 'трек',
     'artist': 'исполнитель',
+    'album': 'альбом',
+    'playlist': 'плейлист',
+    'video': 'видео',
+    'user': 'пользователь',
+    'podcast': 'подкаст',
+    'podcast_episode': 'эпизод подкаста',
 }
 
 
