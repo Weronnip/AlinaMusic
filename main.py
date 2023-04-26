@@ -92,7 +92,7 @@ def post(message):
             input_query = bot.reply_to(message, 'Введите поисковой запрос: ')
             bot.register_next_step_handler(message, send_search_request_and_print_result)
     else:
-        bot.reply_to(message, "Ошибка в коде, просим прощения за неудобства")
+        bot.send_message(chat, "Баг! перезагрузите код, и не пишите \n/playlist и /search !!")
         bot.register_next_step_handler(message, post)
 
 
@@ -133,11 +133,12 @@ def charts(message):
 
 @bot.message_handler(commands=['playlist'])
 def playlist(messages):
+    chat = messages.chat.id
     if messages.text == "playlist":
-        bot.reply_to(messages, "Команда в разработке прощу прощения ")
+        bot.reply_to(chat, "Команда в разработке прощу прощения ")
         bot.register_next_step_handler(messages, playlist)
     else:
-        bot.reply_to(messages, "Баг! перезагрузите код, и не пишите \n/playlist !!")
+        bot.send_message(chat, "Баг! перезагрузите код, и не пишите \n/playlist и /search !!")
         bot.register_next_step_handler(messages, playlist)
 
 @bot.message_handler(commands=['help'])
